@@ -1,3 +1,4 @@
+-- Draw The 8x8 Grid
 function drawBoard()
     local tileSize = 125
     
@@ -24,12 +25,12 @@ function drawBoard()
     end
   end
 
-
 function drawChips()
-    local circleSize = 70
 
-    
+    -- Diameter of Circles
+    local circleSize = 100
 
+    -- Go Through Circle (Coins) Matrix and Draws the Circles
     for Row = 1, #circleGrid do
       for Col = 1, #circleGrid[Row] do
         if circleGrid[Row][Col] ~= "" then
@@ -38,21 +39,70 @@ function drawChips()
             elseif circleGrid[Row][Col] == 1 then
                 love.graphics.setColor(1, 1, 1)
             end
+            -- Drawing Circles
             love.graphics.circle("fill", (Col - 1) * 125 + 125 / 2, (Row - 1) * 125 + 125 / 2, circleSize / 2, 50)
         end
       end
     end
 end
 
+function searchDirs(mouserow, mousecol, dirrow, dircol)
+    local newCoordsX = mouserow + dirrow
+      local newCoordsY = mousecol + dircol
+        local tempFlip = {}
+   while newCoordsX <= 8 and newCoordsX >= 1 and newCoordsY <= 8 and newCoordsY >= 1 do
+
+      
+
+      if circleGrid[newCoordsX][newCoordsY] ~= playerstate then
+         tempFlip[#tempFlip + 1] = {newCoordsX, newCoordsY}
+      elseif circleGrid[newCoordsX][newCoordsY] == playerstate then 
+         if #tempFlip > 0 then
+            for i = 1, #tempFlip do
+                ToFlip[#ToFlip + 1 ] = tempFlip[i]
+            end
+         end
+         return
+      else 
+        break
+      end
+        
+        newCoordsX = newCoordsX + dirrow
+        newCoordsY = newCoordsY + dircol
+   end
+end
+
+function dirSetup(row, col)
+    ToFlip = {}
+   local dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0},
+              {1, 1}, {-1, 1}, {-1, -1}, {1, -1}}
+
+   for i = 1, #dirs do
+      searchDirs(row, col, dirs[i][1], dirs[i][2])
+   end
+   
+end
+
+function flipPieces()
+    for i = 1, #ToFlip do
+        local rows = ToFlip[i][1]
+        local cols = ToFlip[i][2]
+        circleGrid[rows][cols] = playerstate
+    end
+end
+
+
 function love.load()
     -- Load assets and initialize variables here
         -- Chip Grid
+
+        
         _G.circleGrid = {
             {"","","","","","","",""},
             {"","","","","","","",""},
             {"","","","","","","",""},
-            {"","","",0,1,"","",""},
-            {"","","",1,0,"","",""},
+            {"","","", 0, 1,"","",""},
+            {"","","", 1, 0,"","",""},
             {"","","","","","","",""},
             {"","","","","","","",""},
             {"","","","","","","",""},
@@ -60,35 +110,32 @@ function love.load()
     -- FONT
     font = love.graphics.newFont("AmericanCaptain-MdEY.otf", 62)
     
+    --Arrays to Store Circles That Need to be Flipped
+    _G.ToFlip = {}
 
     -- Setting Width and Height Variables
     screenWidth = love.graphics.getWidth()
     screenHeight = love.graphics.getHeight()
 
+    -- Player State and Scores During Game
     playerstate = 0  
+
     blackCurrentScore = 2
     whiteCurrentScore = 2
 end
 
 function love.mousepressed()
-
-    -- Choosing Player Turns
-    if love.mouse.getY() < 1000 then
-        if playerstate == 0 then
-        circleGrid[mouseRow][mouseCol] = 0
-        playerstate = 1
-    elseif playerstate == 1 then
-        circleGrid[mouseRow][mouseCol] = 1
-        playerstate = 0
+    if mouseRow > 0 and mouseRow <= 8 and mouseCol > 0 and mouseCol <= 8 then
+        if circleGrid[mouseRow][mouseCol] == "" then
+            circleGrid[mouseRow][mouseCol] = playerstate
+            dirSetup(mouseRow, mouseCol)
+            flipPieces()
+            playerstate = 1 - playerstate
+        end
     end
-    end
-    
-
-    -- Placing Chips
-    
-    
 end
 
+-- Function to Draw the Current Scores (Pretty Self Explanatory)
 function drawCurrentScore()
     love.graphics.setFont(font, 100)
     love.graphics.setColor(0, 0, 0)
@@ -99,26 +146,18 @@ end
 
 function love.update(dt)
     -- Handle game logic here
-        
         --Mouse Coordinate On Grid
-        if love.mouse.getY() < 1000 then
-            _G.mouseRow = math.ceil(love.mouse.getY() / 125)
-        else 
-            mouseRow = ''
-        end
-
+        _G.mouseRow = math.ceil(love.mouse.getY() / 125)
         _G.mouseCol = math.ceil(love.mouse.getX() / 125)
-        
-        
 end
 
 function love.draw()
     -- Render the game here
 
-    -- Rendering Board
-    love.graphics.setColor(1, 1, 1, 0.4)
-    love.graphics.rectangle("fill", 0, 8 * 125, screenWidth, screenHeight)
-    drawBoard()
+        -- Rendering Bottom Rectangle and Grid
+        love.graphics.setColor(1, 1, 1, 0.4)
+        love.graphics.rectangle("fill", 0, 8 * 125, screenWidth, screenHeight)
+        drawBoard()
 
     -- Printing Text to Screen
     
@@ -142,11 +181,11 @@ function love.draw()
         love.graphics.print(text, x, y, nil)
     end
 
---  Check Mouse Grod Coords love.graphics.print(mouseRow..", "..mouseCol, 600, 600, nil)
+--  Print Mouse Grid Coords 
+    love.graphics.print(mouseRow..", "..mouseCol, 600, 600, nil)
 
-    -- Printing Current Scores
+    -- Rendering Chips and Current Scores
     drawChips()
     drawCurrentScore()
-    
-    
 end
+
