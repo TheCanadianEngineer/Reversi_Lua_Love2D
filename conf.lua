@@ -3,4 +3,5 @@ function love.conf(t)
 	t.window.height = 1375
 	t.window.title = 'Othello'
 	t.window.icon = 'OIP (1).png'
+	t.console = true
 end
