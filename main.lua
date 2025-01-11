@@ -35,14 +35,16 @@ function drawChips()
       for Col = 1, #circleGrid[Row] do
         if circleGrid[Row][Col] ~= "" then
             if circleGrid[Row][Col] == 0 then
-                love.graphics.setColor (0, 0, 0)
+                love.graphics.setColor (1, 1, 1)
+                love.graphics.draw(blackChip, (Col - 1) * 125 + 12, (Row - 1) * 125 + 12)
             elseif circleGrid[Row][Col] == 1 then
                 love.graphics.setColor(1, 1, 1)
+                love.graphics.draw(whiteChip, (Col - 1) * 125 + 12, (Row - 1) * 125 + 12)
             elseif circleGrid[Row][Col] == 2 then
                 love.graphics.setColor(0, 0, 0.1, 0.3)
             end
             -- Drawing Circles
-            love.graphics.circle("fill", (Col - 1) * 125 + 125 / 2, (Row - 1) * 125 + 125 / 2, circleSize / 2, 50)
+            -- love.graphics.circle("fill", (Col - 1) * 125 + 125 / 2, (Row - 1) * 125 + 125 / 2, circleSize / 2, 50)
         end
       end
     end
@@ -189,8 +191,12 @@ end
 
 function love.load()
     -- Load assets and initialize variables here
+    love.graphics.setDefaultFilter("nearest", "nearest")
     _G.canPlay = true
     _G.gameOver = false
+
+    blackChip = love.graphics.newImage("black-chip.png")
+    whiteChip = love.graphics.newImage("white-chip.png")
         -- Chip Grid
         
         
