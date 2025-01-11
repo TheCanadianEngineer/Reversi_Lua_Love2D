@@ -1,28 +1,7 @@
 -- Draw The 8x8 Grid
 function drawBoard()
-    local tileSize = 125
-    
-    _G.Grid = {
-      {1, 0, 1, 0, 1, 0, 1, 0},
-      {0, 1, 0, 1, 0, 1, 0, 1},
-      {1, 0, 1, 0, 1, 0, 1, 0},
-      {0, 1, 0, 1, 0, 1, 0, 1},
-      {1, 0, 1, 0, 1, 0, 1, 0},
-      {0, 1, 0, 1, 0, 1, 0, 1},
-      {1, 0, 1, 0, 1, 0, 1, 0},
-      {0, 1, 0, 1, 0, 1, 0, 1},
-    }
-
-    for Row = 1, #Grid do
-      for Col = 1, #Grid[Row] do
-        if Grid[Row][Col] == 0 then
-          love.graphics.setColor (0, 1, 0, 0.5)
-        elseif Grid[Row][Col] == 1 then
-          love.graphics.setColor(0, 1, 0)
-        end
-        love.graphics.rectangle("fill", (Col - 1) * tileSize, (Row - 1) * tileSize, tileSize, tileSize)
-      end
-    end
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(reversiBoard, 0, 0, 0, 5, 5)
   end
 
 function drawChips()
@@ -195,6 +174,8 @@ function love.load()
     _G.canPlay = true
     _G.gameOver = false
 
+    reversiBoard = love.graphics.newImage("reversi-board.png")
+
     blackChip = love.graphics.newImage("black-chip.png")
     whiteChip = love.graphics.newImage("white-chip.png")
         -- Chip Grid
@@ -333,4 +314,5 @@ function love.draw()
         love.graphics.setColor(1, 0, 0)
         love.graphics.print("Game Over!", screenWidth / 2 - 100, 550)
     end
+    
 end
