@@ -20,10 +20,9 @@ function drawChips()
                 love.graphics.setColor(1, 1, 1)
                 love.graphics.draw(whiteChip, (Col - 1) * 125 + 12, (Row - 1) * 125 + 12)
             elseif circleGrid[Row][Col] == 2 then
-                love.graphics.setColor(0, 0, 0.1, 0.3)
+                love.graphics.setColor(0, 0, 0.1, 0.7)
+                love.graphics.circle("fill", (Col - 1) * 125 + 125 / 2, (Row - 1) * 125 + 125 / 2, circleSize / 2, 50)
             end
-            -- Drawing Circles
-            -- love.graphics.circle("fill", (Col - 1) * 125 + 125 / 2, (Row - 1) * 125 + 125 / 2, circleSize / 2, 50)
         end
       end
     end
@@ -176,8 +175,14 @@ function love.load()
 
     reversiBoard = love.graphics.newImage("reversi-board.png")
 
-    blackChip = love.graphics.newImage("black-chip.png")
-    whiteChip = love.graphics.newImage("white-chip.png")
+    blackChip = love.graphics.newImage("Images/black-chip.png")
+    whiteChip = love.graphics.newImage("Images/white-chip.png")
+
+    blackNoPlay = love.graphics.newImage("Images/black-can-not-play-message.png")
+    whiteNoPlay = love.graphics.newImage("Images/white-can-not-play-message.png")
+
+    blackWin = love.graphics.newImage("Images/black-won-message.png")
+    whiteWin = love.graphics.newImage("Images/white-won-message.png")
         -- Chip Grid
         
         
@@ -299,20 +304,34 @@ function love.draw()
     drawChips()
     drawCurrentScore()
 
-    love.graphics.setColor(1, 0, 0)
-    if canPlay == false then
-        love.graphics.setColor(1, 0, 0)
-        love.graphics.rectangle("fill", screenWidth / 2 - 400, 400, 800, 300)
-        love.graphics.setColor(0, 0, 1)
-        love.graphics.print("Player Can't Play", screenWidth / 2 - 100, 550)
+    if gameOver == true then
+        if playerstate == 0 then
+            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(blackWin, screenWidth / 2 - blackWin:getWidth(), 350, 0, 2, 2)
+        elseif playerstate == 1 then
+            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(whiteWin, screenWidth / 2 - whiteWin:getWidth(), 350, 0, 2, 2)
+        end
     end
 
-    love.graphics.setColor(0, 0, 1)
-    if gameOver == true then
-        love.graphics.setColor(0, 0, 1)
-        love.graphics.rectangle("fill", screenWidth / 2 - 400, 400, 800, 300)
-        love.graphics.setColor(1, 0, 0)
-        love.graphics.print("Game Over!", screenWidth / 2 - 100, 550)
+    if canPlay == false and gameOver == false then
+        if playerstate == 0 then
+            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(blackNoPlay, screenWidth / 2 - blackNoPlay:getWidth(), 350, 0, 2, 2)
+        elseif playerstate == 1 then
+            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(whiteNoPlay, screenWidth / 2 - whiteNoPlay:getWidth(), 350, 0, 2, 2)
+
+            love.graphics.setColor(0, 0, 0, 0.7)
+            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
+        end
     end
-    
 end
