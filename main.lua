@@ -39,7 +39,7 @@ function drawChips()
             elseif circleGrid[Row][Col] == 1 then
                 love.graphics.setColor(1, 1, 1)
             elseif circleGrid[Row][Col] == 2 then
-                love.graphics.setColor(0, 0, 0.1, 0.1)
+                love.graphics.setColor(0, 0, 0.1, 0.3)
             end
             -- Drawing Circles
             love.graphics.circle("fill", (Col - 1) * 125 + 125 / 2, (Row - 1) * 125 + 125 / 2, circleSize / 2, 50)
@@ -86,10 +86,22 @@ function dirSetup(row, col)
 end
 
 function flipPieces()
+    
     for i = 1, #ToFlip do
         local rows = ToFlip[i][1]
         local cols = ToFlip[i][2]
         circleGrid[rows][cols] = playerstate
+    end
+blackCurrentScore = 0
+    whiteCurrentScore = 0
+    for x = 1, #circleGrid do
+        for y = 1, #circleGrid[x] do
+        if circleGrid[x][y] == 0 then
+            blackCurrentScore = blackCurrentScore + 1
+        elseif circleGrid[x][y] == 1 then
+            whiteCurrentScore = whiteCurrentScore + 1
+        end
+        end
     end
 end
 
@@ -161,6 +173,10 @@ end
 
 function writeMoves()
     print("Writing moves")
+    if #validMoves == 0 then
+        print("Can't Play")
+        canPlay = false
+    end
     for i = 1, #validMoves do
         local rows = validMoves[i][1]
         local cols = validMoves[i][2]
@@ -173,6 +189,8 @@ end
 
 function love.load()
     -- Load assets and initialize variables here
+    _G.canPlay = true
+    _G.gameOver = false
         -- Chip Grid
         
         
@@ -217,14 +235,25 @@ end
 
 function love.mousepressed()
     if mouseRow > 0 and mouseRow <= 8 and mouseCol > 0 and mouseCol <= 8 then
-        if circleGrid[mouseRow][mouseCol] == 2 then
+        if canPlay == true and gameOver == false then
+            if circleGrid[mouseRow][mouseCol] == 2 then
             circleGrid[mouseRow][mouseCol] = playerstate
             dirSetup(mouseRow, mouseCol)
             flipPieces()
             playerstate = 1 - playerstate
             checkMoves()
             writeMoves()
-        end
+            end
+        elseif canPlay == false and gameOver == false then
+            playerstate = 1 - playerstate
+            checkMoves()
+            writeMoves()
+            canPlay = true
+        end 
+    end
+
+    if blackCurrentScore + whiteCurrentScore ==  64 then
+        gameOver = true
     end
 end
 
@@ -275,9 +304,27 @@ function love.draw()
     end
 
 --  Print Mouse Grid Coords 
-    love.graphics.print(mouseRow..", "..mouseCol, 600, 600, nil)
+    -- love.graphics.print(mouseRow..", "..mouseCol, 600, 600, nil)
 
     -- Rendering Chips and Current Scores
+    
+
     drawChips()
     drawCurrentScore()
+
+    love.graphics.setColor(1, 0, 0)
+    if canPlay == false then
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.rectangle("fill", screenWidth / 2 - 400, 400, 800, 300)
+        love.graphics.setColor(0, 0, 1)
+        love.graphics.print("Player Can't Play", screenWidth / 2 - 100, 550)
+    end
+
+    love.graphics.setColor(0, 0, 1)
+    if gameOver == true then
+        love.graphics.setColor(0, 0, 1)
+        love.graphics.rectangle("fill", screenWidth / 2 - 400, 400, 800, 300)
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.print("Game Over!", screenWidth / 2 - 100, 550)
+    end
 end
