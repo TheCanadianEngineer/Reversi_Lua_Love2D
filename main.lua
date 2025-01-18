@@ -122,15 +122,15 @@ function searchMoves(moverow, movecol, dirrow, dircol)
     while CoordsX <= 8 and CoordsX >= 1 and CoordsY <= 8 and CoordsY >= 1 do
         if circleGrid[CoordsX] and circleGrid[CoordsX][CoordsY] then
             if circleGrid[CoordsX][CoordsY] ~= playerstate and circleGrid[CoordsX][CoordsY] ~= "" then
-                print("Valid move at "..moverow.."/"..movecol)
+                -- print("Valid move at "..moverow.."/"..movecol)
                 tempMove[#tempMove + 1] = {moveR, moveY}
             elseif circleGrid[CoordsX][CoordsY] == playerstate then 
                 if #tempMove > 0 then
                     for i = 1, #tempMove do
                         --Inputting Coords of Chips to Valid Moves if There are Some
-                        print("Updating Valid Moves")
+                        -- print("Updating Valid Moves")
                         validMoves[#validMoves + 1 ] = tempMove[i]
-                        print(validMoves[i][1]..validMoves[i][2])
+                        -- print(validMoves[i][1]..validMoves[i][2])
                     end
                 end
                 return
@@ -162,8 +162,6 @@ function moveSetup(row, col)
    end
    
 end
-
-
 
 function checkMoves()
     checkedGrids = {}
@@ -217,26 +215,28 @@ function love.load()
     -- Game State Variables
     canPlay = true
     gameOver = false
+    prevPlayerSkip = false
 
     -- Load Images
     reversiBoard = love.graphics.newImage("reversi-board.png")
 
     blackChip = love.graphics.newImage("Images/black-chip.png")
-    whiteChip = love.graphics.newImage("Images/white-chip.png")
+    whiteChip = love.graphics.newImage("Images/white-chip-.png")
 
     blackNoPlay = love.graphics.newImage("Images/black-can-not-play-message.png")
     whiteNoPlay = love.graphics.newImage("Images/white-can-not-play-message.png")
 
     blackWin = love.graphics.newImage("Images/black-won-message.png")
     whiteWin = love.graphics.newImage("Images/white-won-message.png")
+    tieGame = love.graphics.newImage("Images/tie-game-message.png")
 
     -- Chip Grid
     circleGrid = {
     {"","","","","","","",""},
     {"","","","","","","",""},
     {"","","","","","","",""},
-    {"","","", 0, 1,"","",""},
     {"","","", 1, 0,"","",""},
+    {"","","", 0, 1,"","",""},
     {"","","","","","","",""},
     {"","","","","","","",""},
     {"","","","","","","",""},
@@ -292,12 +292,27 @@ function love.mousepressed()
                 writeMoves()
             end
         elseif canPlay == false and gameOver == false then
-            --Changes Player State and Checks Valid Moves for Them
+            --Changes Player State
             playerstate = 1 - playerstate
-            checkMoves()
-            writeMoves()
             --Reset Playability
             canPlay = true
+            --Checks Valid Moves for Them
+            checkMoves()
+            writeMoves()
+            --Check if the Previous Player had to Skip Their Turn to see if the Game is Over
+            if prevPlayerSkip == true then
+                print("Game should be over")
+                print("Game State:")
+                print(gameOver)
+                print(canPlay)
+                gameOver = true
+            else
+                print("Skip 1")
+                print("Game State:")
+                print(gameOver)
+                print(canPlay)
+                prevPlayerSkip = true
+            end
         end 
     end
     --Check if Game is Over
@@ -351,22 +366,27 @@ function love.draw()
         love.graphics.print(text, x, y, nil)
     end
 
-    --Draw the Chips and the Scores
+    --Draw the Chips and the Scores`
     drawChips()
     drawCurrentScore()
 
     --Deal With Game Over State
     if gameOver == true then
-        if playerstate == 0 then
+        if blackCurrentScore > whiteCurrentScore then
             love.graphics.setColor(0, 0, 0, 0.5)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(blackWin, screenWidth / 2 - blackWin:getWidth(), 350, 0, 2, 2)
-        elseif playerstate == 1 then
+        elseif whiteCurrentScore > blackCurrentScore then
             love.graphics.setColor(0, 0, 0, 0.5)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(whiteWin, screenWidth / 2 - whiteWin:getWidth(), 350, 0, 2, 2)
+        elseif blackCurrentScore == whiteCurrentScore then
+            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(tieGame, screenWidth / 2 - tieGame:getWidth(), 350, 0, 2, 2)
         end
     end
 
@@ -382,9 +402,6 @@ function love.draw()
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(whiteNoPlay, screenWidth / 2 - whiteNoPlay:getWidth(), 350, 0, 2, 2)
-
-            love.graphics.setColor(0, 0, 0, 0.7)
-            love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
         end
     end
 end
