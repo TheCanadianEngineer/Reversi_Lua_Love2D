@@ -211,14 +211,17 @@ function love.load()
 -- Load assets and initialize variables here
     --Setting Filter for Perfect Pixels
     love.graphics.setDefaultFilter("nearest", "nearest")
+    gameStart()
+end
 
+function gameStart() 
     -- Game State Variables
     canPlay = true
     gameOver = false
     prevPlayerSkip = false
 
     -- Load Images
-    reversiBoard = love.graphics.newImage("reversi-board.png")
+    reversiBoard = love.graphics.newImage("pixil-frame-0 (3).png")
 
     blackChip = love.graphics.newImage("Images/black-chip.png")
     whiteChip = love.graphics.newImage("Images/white-chip-.png")
@@ -314,6 +317,9 @@ function love.mousepressed()
                 prevPlayerSkip = true
             end
         end 
+        if gameOver then
+            gameStart()
+        end
     end
     --Check if Game is Over
     if blackCurrentScore + whiteCurrentScore ==  64 then
