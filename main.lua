@@ -212,6 +212,14 @@ function love.load()
     --Setting Filter for Perfect Pixels
     love.graphics.setDefaultFilter("nearest", "nearest")
     gameStart()
+
+    blackWins = 0
+    whiteWins = 0
+
+    blackDraws = 0
+    whiteDraws = 0
+
+    gameCount = 0
 end
 
 function gameStart() 
@@ -232,6 +240,11 @@ function gameStart()
     blackWin = love.graphics.newImage("Images/black-won-message.png")
     whiteWin = love.graphics.newImage("Images/white-won-message.png")
     tieGame = love.graphics.newImage("Images/tie-game-message.png")
+
+    scoreBoard = love.graphics.newImage("Images/Othello-score-board.png")
+
+    playAgain = love.graphics.newImage("Images/play-again-button.png")
+    quit = love.graphics.newImage("Images/quit-button.png")
 
     -- Chip Grid
     circleGrid = {
@@ -325,21 +338,40 @@ function love.mousepressed()
     if blackCurrentScore + whiteCurrentScore ==  64 then
         gameOver = true
     end
+
+    if gameOver then
+        gameCount = gameCount + 1
+        if mouseX > 560 and mouseX < 800 and mouseY > 750 and mouseY < 890 then
+            love.event.quit()
+        elseif mouseX > 200 and mouseX < 440 and mouseY > 750 and mouseY < 890 then
+            gameStart()
+        end
+    end
 end
 --Repeat Every Screen Refresh
 function love.update(dt)
     --Mouse Coordinate On Grid
     mouseRow = math.ceil(love.mouse.getY() / 125)
     mouseCol = math.ceil(love.mouse.getX() / 125)
+
+    mouseX = love.mouse.getX()
+    mouseY = love.mouse.getY()
 end
 
 -- Function to Draw the Current Scores (Pretty Self Explanatory)
 function drawCurrentScore()
     love.graphics.setFont(font, 100)
     love.graphics.setColor(0, 0, 0)
-    love.graphics.print("•"..blackCurrentScore, 125, 1148, nil, 2, 2)
+    local lengthScoreBlack = font:getWidth(blackCurrentScore) * 2
+    love.graphics.print(blackCurrentScore, 190 - (lengthScoreBlack / 2), 1148, nil, 2, 2)
+    love.graphics.setFont(font, 30)
+    -- love.graphics.print(blackWins, 129, 1260, nil)
+    -- love.graphics.print(blackDraws, 219-24, 1260, nil)
+    local lengthScoreWhite = font:getWidth(whiteCurrentScore) * 2
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print("•"..whiteCurrentScore, 757.5, 1148, nil, 2, 2)
+    love.graphics.print(whiteCurrentScore, 813 - (lengthScoreWhite / 2), 1148, nil, 2, 2)
+    -- love.graphics.print(whiteDraws, 960 - 129, 1260, nil)
+    -- love.graphics.print(whiteWins, 960 - (219-24), 1260, nil)
 end
 
 function love.draw()
@@ -357,6 +389,8 @@ function love.draw()
         -- Printing Player Turn
     local textHeight = font:getHeight()
     local y = 1050
+
+    love.graphics.draw(scoreBoard, 0, 1000)
 
     if playerstate == 0 then
         love.graphics.setColor(0, 0, 0)
@@ -379,35 +413,49 @@ function love.draw()
     --Deal With Game Over State
     if gameOver == true then
         if blackCurrentScore > whiteCurrentScore then
-            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.setColor(0, 0, 0, 0.6)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(blackWin, screenWidth / 2 - blackWin:getWidth(), 350, 0, 2, 2)
+            if blackWins + whiteWins + blackDraws ~= gameCount then
+                blackWins = blackWins + 1
+            end
         elseif whiteCurrentScore > blackCurrentScore then
-            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.setColor(0, 0, 0, 0.6)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(whiteWin, screenWidth / 2 - whiteWin:getWidth(), 350, 0, 2, 2)
+            if blackWins + whiteWins + blackDraws ~= gameCount then
+                whiteWins = whiteWins + 1
+            end
         elseif blackCurrentScore == whiteCurrentScore then
-            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.setColor(0, 0, 0, 0.6)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(tieGame, screenWidth / 2 - tieGame:getWidth(), 350, 0, 2, 2)
+            if blackWins + whiteWins + blackDraws ~= gameCount then
+                blackDraws = blackDraws + 1
+                whiteDraws = blackDraws + 1
+            end
+            
         end
+        love.graphics.draw(playAgain, screenWidth / 2 - 300, 750, 0, 2, 2)
+        love.graphics.draw(quit, screenWidth / 2 + 60, 750, 0, 2, 2)
     end
 
     --Deal with Can't Play State
     if canPlay == false and gameOver == false then
         if playerstate == 0 then
-            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.setColor(0, 0, 0, 0.6)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(blackNoPlay, screenWidth / 2 - blackNoPlay:getWidth(), 350, 0, 2, 2)
         elseif playerstate == 1 then
-            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.setColor(0, 0, 0, 0.6)
             love.graphics.rectangle("fill", 0, 0, screenWidth, screenHeight)
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(whiteNoPlay, screenWidth / 2 - whiteNoPlay:getWidth(), 350, 0, 2, 2)
         end
     end
+    -- love.graphics.print(mouseX..", "..mouseY, 300, 900)
 end
