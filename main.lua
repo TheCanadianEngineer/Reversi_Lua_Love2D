@@ -194,7 +194,7 @@ function writeMoves()
 
     --No Valid Moves
     if #validMoves == 0 then
-        print("Can't Play")
+        -- print("Can't Play")
         canPlay = false
     end
     --Update Circle Grid With Valid Moves
@@ -248,14 +248,14 @@ function gameStart()
 
     -- Chip Grid
     circleGrid = {
-    {"","","","","","","",""},
-    {"","","","","","","",""},
-    {"","","","","","","",""},
+    {1,1,1,1,1,1,1,1},
+    {1,1,1,1,1,1,1,1},
+    {1,1,1,1,1,1,1,1},
     {"","","", 1, 0,"","",""},
     {"","","", 0, 1,"","",""},
-    {"","","","","","","",""},
-    {"","","","","","","",""},
-    {"","","","","","","",""},
+    {1,1,1,1,1,1,1,1},
+    {1,1,1,1,1,1,1,1},
+    {1,1,1,1,1,1,1,1},
     }
 
     -- Resetting The Checked Grids Array
@@ -306,6 +306,7 @@ function love.mousepressed()
                 --Check for Valid Moves
                 checkMoves()
                 writeMoves()
+                prevPlayerSkip = false
             end
         elseif canPlay == false and gameOver == false then
             --Changes Player State
@@ -317,23 +318,22 @@ function love.mousepressed()
             writeMoves()
             --Check if the Previous Player had to Skip Their Turn to see if the Game is Over
             if prevPlayerSkip == true then
-                print("Game should be over")
-                print("Game State:")
-                print(gameOver)
-                print(canPlay)
+                -- print("Game should be over")
+                -- print("Game State:")
+                -- print(gameOver)
+                -- print(canPlay)
                 gameOver = true
+                print(prevPlayerSkip)
             else
-                print("Skip 1")
-                print("Game State:")
-                print(gameOver)
-                print(canPlay)
+                -- print("Skip 1")
+                -- print("Game State:")
+                -- print(gameOver)
+                -- print(canPlay)
                 prevPlayerSkip = true
+                print(prevPlayerSkip)
             end
         end 
-        if gameOver then
-            gameStart()
-        end
-    end
+           end
     --Check if Game is Over
     if blackCurrentScore + whiteCurrentScore ==  64 then
         gameOver = true
